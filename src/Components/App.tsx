@@ -2,14 +2,24 @@ import React from 'react';
 import "../CSS/Style.css";
 import { Row, Col, Card, Navbar, Button } from 'react-bootstrap'
 import { ScrambleDisplay } from "scramble-display"
+import { PNG, Type as CubeType, SVG } from "sr-puzzlegen"
 
 
 function App() {
 
-  let scramble = new ScrambleDisplay();
-  scramble.scramble = "F' D F2 L2 U' R2 U' F2 D2 R2 F2 U2 F R' B F D' B2 U";
-  scramble.visualization = "2D";
+  //let scramble = new ScrambleDisplay();
+  //scramble.scramble = "F' D F2 L2 U' R2 U' F2 D2 R2 F2 U2 F R' B F D' B2 U";
+  //scramble.visualization = "2D";
 
+  // https://tdecker91.github.io/puzzlegen-demo/
+
+  let options = {
+    "width": 250,
+    "height": 250,
+    "puzzle": {
+      "alg": "F U2"
+    }
+  }
 
   let page = (
     <div className="App">
@@ -38,7 +48,9 @@ function App() {
     </div>
   )
 
-  document.body.appendChild(scramble);
+  let cube: Element = document.getElementById("cube") as Element;
+
+  let png = PNG(cube, CubeType.CUBE_NET, options);
 
   return page;
 }
