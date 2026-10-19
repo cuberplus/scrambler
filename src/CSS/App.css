@@ -91,6 +91,7 @@ progress::-moz-progress-bar { background: #88ab68; }
 .column-custom { min-width: 130px; overflow-wrap: anywhere; }
 .sort-button { border: 0; padding: 0; background: transparent; font: inherit; color: inherit; text-align: center; }
 .sort-button span { white-space: nowrap; }
+.print-column-label { display: none; }
 .algorithm { font-family: 'Cascadia Code', 'SFMono-Regular', Consolas, monospace; font-size: 11px; line-height: 1.9; word-spacing: 2px; display: block; }
 .algorithm.solution { color: #477154; }
 .cube-net { display: block; width: 112px; height: 85px; margin: auto; }
@@ -114,33 +115,38 @@ progress::-moz-progress-bar { background: #88ab68; }
 @media (min-width: 1550px) { .workspace { grid-template-columns: 290px minmax(0, 1fr); gap: 28px; } .worksheet td { padding: 18px; } .algorithm { font-size: 12px; } }
 @media (max-width: 1000px) { main { padding: 0 24px; } .topbar { padding: 0 24px; } .workspace { grid-template-columns: 230px minmax(0, 1fr); gap: 16px; } .settings-panel { padding: 20px 16px; } .worksheet-heading { padding: 20px 16px; } }
 @media (max-width: 720px) { .topbar { height: 72px; padding: 0 20px; } .brand { font-size: 23px; } .local-badge { font-size: 10px; } main { padding: 0 16px; } .workspace { grid-template-columns: minmax(0, 1fr); } .settings-panel { padding: 20px; } fieldset { display: grid; grid-template-columns: 1fr 1fr; gap: 0 15px; } fieldset > * { grid-column: 1 / -1; } .solver-note { margin-top: 16px; padding-top: 14px; } .solver-note p { font-size: 11px; } .worksheet-heading { padding: 20px 16px; } .worksheet-heading h2 { font-size: 14px; } .sheet-toolbar, .generation-status { padding-left: 16px; padding-right: 16px; } .sheet-footer { font-size: 8px; padding: 15px; } .page-footer { align-items: start; flex-direction: column; gap: 12px; } .page-footer p { text-align: left; } }
-@page { size: landscape; margin: 12mm; }
+/* Zero page margins suppress browser headers/footers; cloned padding keeps the grid inset. */
+@page { size: portrait; margin: 0; }
 @media print {
   :root { --ink: #15271e; }
-  body { background: white; color: black; print-color-adjust: exact; -webkit-print-color-adjust: exact; font-size: 10pt; }
-  .topbar { height: 40px; padding: 0 0 8px; border-bottom: 1px solid #aaa; }
-  .brand { font-size: 18px; }
-  .local-badge, .settings-panel, .print-button, .sheet-toolbar, .generation-status, progress, .sheet-footer, .page-footer { display: none !important; }
+  body { padding: 0 6mm; background: white; color: black; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .topbar, .settings-panel, .page-footer, .worksheet-panel > :not(.table-scroll), .table-scroll > :not(.worksheet), .worksheet caption { display: none !important; }
   main { max-width: none; padding: 0; }
   .workspace { display: block; margin-top: 0; }
   .worksheet-panel { border: 0; border-radius: 0; overflow: visible; }
-  .worksheet-heading { padding: 14px 0; }
-  .table-scroll { overflow: visible; }
-  .worksheet { table-layout: fixed; width: 100%; }
+  .table-scroll { overflow: visible; padding: 6mm 0; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .worksheet { table-layout: fixed; width: 100%; font-size: calc(36pt / var(--print-columns, 6)); color: black; }
   .worksheet thead { display: table-header-group; }
   .worksheet tr { break-inside: avoid; page-break-inside: avoid; }
-  .worksheet th, .worksheet td { padding: 8px; border: 1px solid #bbb; min-width: 0; max-width: none; }
-  .worksheet th { font-size: 8pt; color: #222; }
-  .worksheet td { font-size: 8pt; }
-  .worksheet .row-number { width: 28px; padding: 6px; color: #555; }
-  .column-visualization { width: 95px; }
-  .column-turns { width: 65px; }
-  .column-cross { width: 80px; }
-  .column-pairs { width: 95px; }
+  .worksheet tbody tr { height: 9.5mm; }
+  .worksheet tbody tr:nth-child(25n):not(:last-child) { break-after: page; page-break-after: always; }
+  .worksheet th, .worksheet td { padding: .3mm .5mm; border: 1px solid #aaa; min-width: 0; max-width: none; line-height: 1.1; }
+  .worksheet th { font-size: inherit; color: black; overflow-wrap: anywhere; }
+  .worksheet td { font-size: inherit; }
+  .worksheet .row-number { width: 5mm; padding: .3mm; font-size: inherit; color: #333; }
+  .column-visualization { width: 16mm; }
+  .column-turns { width: 12mm; }
+  .column-cross { width: 15mm; }
+  .column-pairs { width: 20mm; }
   .column-custom { min-width: 0; }
-  .cube-net { width: 85px; height: 65px; }
-  .algorithm { font-size: 8pt; line-height: 1.6; word-spacing: 0; }
-  .turn-count { font-size: 13pt; border: 0; background: transparent; padding: 0; }
-  .turn-count small { color: #555; }
-  .color-tag, .pair-list { font-size: 8pt; color: #333; }
+  .cube-net { width: 11mm; height: 8.4mm; }
+  .algorithm { font-size: inherit; line-height: 1.1; word-spacing: 0; overflow-wrap: anywhere; }
+  .turn-count { font-size: inherit; min-width: 0; border: 0; background: transparent; padding: 0; }
+  .turn-count small { font-size: .65em; color: #333; margin-top: 1px; letter-spacing: 0; }
+  .color-tag, .pair-list, .not-applicable { font-size: inherit; color: #333; }
+  .color-tag { gap: 1mm; }
+  .color-tag i { width: 1.5mm; height: 1.5mm; border-radius: 0; }
+  .pair-list { gap: .5mm; }
+  .sort-button { display: none; }
+  .print-column-label { display: inline; }
 }

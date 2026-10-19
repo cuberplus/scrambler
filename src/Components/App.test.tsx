@@ -107,6 +107,26 @@ test('XX-Cross options, fixed colors/pairs, turn bounds, printing, and cancellat
   print.mockRestore();
 });
 
+test('print density follows the selected columns without changing the screen worksheet', () => {
+  render(<App />);
+  addRows();
+  const table = screen.getByRole('table');
+  expect(table.querySelector('.print-column-label')).toHaveTextContent('# Turns Required');
+  expect(table.querySelector('.print-column-label')).toHaveAttribute('aria-hidden', 'true');
+  expect(table.style.getPropertyValue('--print-columns')).toBe('6');
+  for (const name of ['My solution', 'My time']) {
+    fireEvent.change(screen.getByLabelText('Add a blank column'), { target: { value: name } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add custom column' }));
+  }
+  expect(table.style.getPropertyValue('--print-columns')).toBe('8');
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Scramble Visualization' }));
+  expect(table.style.getPropertyValue('--print-columns')).toBe('7');
+  fireEvent.click(screen.getByRole('button', { name: 'Remove My time column' }));
+  expect(table.style.getPropertyValue('--print-columns')).toBe('6');
+  expect(screen.getAllByRole('row')).toHaveLength(3);
+  expect(screen.getByRole('columnheader', { name: 'My solution' })).toBeInTheDocument();
+});
+
 test('invalid constraints and solver errors are visible, and a stopped worksheet retains finished rows', () => {
   render(<App />);
   emit({ type: 'row', row: { id: 1, scramble: 'R', moves: [2], algorithm: "R'", cross: 'White', pairs: ['Blue / Red'], nodes: 1, elapsedMs: 1 } });

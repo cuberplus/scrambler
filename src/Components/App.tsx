@@ -102,6 +102,9 @@ function App() {
   const sorted = rows.slice().sort((a, b) =>
     (ascending ? 1 : -1) * (a.moves.length - b.moves.length) || a.id - b.id);
   const visible = BUILT_INS.filter(([key]) => selected.includes(key));
+  const printStyle: React.CSSProperties & { '--print-columns': number } = {
+    '--print-columns': Math.max(6, visible.length + custom.length),
+  };
   const hasPairs = settings.mode !== 'cross';
   const addColumn = (event: React.FormEvent) => {
     event.preventDefault();
@@ -213,11 +216,11 @@ function App() {
             </div>
             {busy && <progress value={rows.length} max={batchSettings.count} aria-label="Worksheet generation progress" />}
             <div className="table-scroll">
-              {visible.length + custom.length > 0 ? <table className="worksheet">
+              {visible.length + custom.length > 0 ? <table className="worksheet" style={printStyle}>
                 <caption className="sr-only">Optimal {MODE_LABELS[batchSettings.mode]} practice scrambles, sorted by solution length</caption>
                 <thead><tr><th scope="col" className="row-number">No.</th>{visible.map(([key, label]) =>
                   <th key={key} scope="col" className={`column-${key}`}>{key === 'turns'
-                    ? <button className="sort-button" onClick={() => setAscending(!ascending)}>{label} <span aria-hidden="true">{ascending ? '↑' : '↓'}</span></button>
+                    ? <><button className="sort-button" onClick={() => setAscending(!ascending)}>{label} <span aria-hidden="true">{ascending ? '↑' : '↓'}</span></button><span className="print-column-label" aria-hidden="true">{label}</span></>
                     : label}</th>)}{custom.map(c => <th key={c.id} scope="col" className="column-custom">{c.name}</th>)}</tr></thead>
                 <tbody>{sorted.map((row, i) => <tr key={row.id}><td className="row-number">{String(i + 1).padStart(2, '0')}</td>
                   {visible.map(([key]) => <td key={key} className={`column-${key}`}>{cell(row, key)}</td>)}

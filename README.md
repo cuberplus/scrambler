@@ -38,6 +38,14 @@ The `build` directory can also be served by any static host at `/scrambler/`.
 Serve over HTTP(S), not `file://`, so the browser can load the bundled worker.
 A deployed site needs no application server.
 
+## Print
+
+Use **Print sheet** for a grid-only, portrait worksheet: no site header, footer,
+settings, status, or promotional text. Column headings repeat as part of the
+grid. The compact layout fits 25 scrambles per full page on Letter and A4 paper;
+only the final page may contain fewer rows. Additional custom columns reduce
+the print font size to preserve the page density without dropping columns.
+
 ## Targets and notation
 
 - Cross: four base-color edges, aligned with their centers.
