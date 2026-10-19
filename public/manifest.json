@@ -1,6 +1,6 @@
 {
-  "short_name": "Cubeast Analyzer",
-  "name": "Cubeast Analyzer",
+  "short_name": "Scrambler",
+  "name": "CuberPlus - Scrambler",
   "icons": [
     {
       "src": "favicon.ico",
@@ -14,6 +14,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#183d32",
+  "background_color": "#fafbf7"
 }

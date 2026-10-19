@@ -50,6 +50,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:ci": "react-scripts test --watchAll=false --runInBand",
+    "test:performance": "react-scripts test --watchAll=false --runInBand --testPathPattern=performance",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
