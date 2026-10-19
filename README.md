@@ -19,9 +19,21 @@ npm run test:performance
 npm run build
 ```
 
-Deploy the `build` directory to any static host; the existing custom domain is
-`scrambler.cuberplus.com`. Serve over HTTP(S), not `file://`, so the browser can
-load the bundled worker. A deployed site needs no application server.
+## Deploy
+
+```sh
+npm run deploy
+```
+
+This builds the website with the `/scrambler` asset prefix and publishes `build`
+to the `gh-pages` branch. GitHub Pages serves that branch from its root at
+`https://cuberplus.com/scrambler/`, inheriting the custom domain from the
+`cuberplus.github.io` site. Do not add a project-level `CNAME`, which would
+override that inherited domain.
+
+The `build` directory can also be served by any static host at `/scrambler/`.
+Serve over HTTP(S), not `file://`, so the browser can load the bundled worker.
+A deployed site needs no application server.
 
 ## Targets and notation
 

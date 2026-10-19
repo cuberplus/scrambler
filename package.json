@@ -1,7 +1,7 @@
 {
   "name": "cuberplus",
   "version": "0.1.0",
-  "homepage": "https://scrambler.cuberplus.com",
+  "homepage": "https://cuberplus.com/scrambler",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -46,7 +46,7 @@
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d build --nojekyll",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
