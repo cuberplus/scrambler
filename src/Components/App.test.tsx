@@ -56,7 +56,10 @@ test('the workspace starts below the header without a promotional intro', () => 
 
 test('initial generation requests 20 optimal X-Cross scrambles in a worker and keeps controls responsive', () => {
   render(<App />);
-  expect(postMessage).toHaveBeenCalledWith(expect.objectContaining({ mode: 'xcross', count: 20 }));
+  expect(postMessage).toHaveBeenCalledWith(expect.objectContaining({
+    mode: 'xcross', count: 20, minimum: 2, maximum: 20,
+  }));
+  expect(screen.getByLabelText('Minimum turns')).toHaveValue(2);
   expect(screen.getByRole('button', { name: /Generate worksheet/ })).toBeDisabled();
   expect(screen.getByText('Columns')).toBeEnabled();
   expect(screen.getByRole('progressbar')).toHaveAttribute('max', '20');

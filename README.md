@@ -1,10 +1,13 @@
 # Scrambler
 
-A static, browser-only Rubik's Cube practice-sheet builder. Generates 25-turn
-random-move scrambles, solves the selected partial-cube target optimally in HTM,
-and prints the selected grid columns. There are no API calls, remote solvers,
-external fonts, or analytics. These are practice scrambles, not WCA uniform
-random-state scrambles.
+A static, browser-only Rubik's Cube practice-sheet builder. Generates
+difficulty-balanced practice scrambles, solves the selected partial-cube target
+optimally in HTM, and prints the selected grid columns. There are no API calls,
+remote solvers, external fonts, or analytics. These are practice scrambles, not
+WCA uniform random-state scrambles.
+
+The default worksheet contains 20 X-Cross scrambles with a minimum solution
+length of 2 HTM.
 
 ## Run
 
@@ -54,8 +57,17 @@ each specified pair must be among the two solved pairs. If several choices tie,
 one is returned; incidental additional solved pairs are not listed.
 
 Bounds are inclusive and filter the **optimal** solution length. The solver
-never pads a short solution to meet the minimum. Rare or impossible filters stop
-after a bounded number of attempts or three minutes, preserving completed rows.
+never pads a short solution to meet the minimum. Generation favors the least
+represented requested lengths. Starting from a 25-turn random-move scramble,
+it can append a prefix of an optimal solution to reach an easier case; the
+remaining suffix is still provably optimal across all allowed colors and pairs.
+This avoids waiting for rare easy scrambles to occur randomly. Final scramble
+algorithms can therefore exceed 25 turns. Lengths above the seed's optimum
+cannot be manufactured this way, so rare or unattainable high lengths may be
+underrepresented rather than blocking the whole worksheet.
+
+Rare or impossible filters stop after a bounded number of attempts or three
+minutes, preserving completed rows.
 An individual search has a 30-second budget; if it expires, the app reports an
 error rather than returning an unproven result. Cancel terminates the worker
 immediately. A subsequent batch reuses tables unless the worker was stopped.
@@ -79,7 +91,8 @@ scrambles. Cube nets are inline SVGs computed from the same physical state.
 Tests compare moves and diagrams against an independent 54-facelet model,
 check cube invariants and all 24 rotations, compare shallow optimal solutions
 with independent exhaustive search, and exercise constraints, filtering,
-timeouts, UI behavior, and cancellation. Deterministic performance regressions
+timeouts, balanced length distributions, UI behavior, and cancellation.
+Deterministic performance regressions
 cover cold startup (15 seconds), a warm 20-row color-neutral X-Cross batch
 (2 seconds), representative neutral XX-Cross searches (2 seconds), and a
 10-row XX-Cross batch with two fixed diagonal pairs (5 seconds).

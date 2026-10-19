@@ -8,20 +8,94 @@ const result = (length: number): Solution => ({
 });
 const immediate = () => Promise.resolve();
 
-test('inclusive bounds filter optimal lengths, duplicate scrambles are skipped, and IDs are consecutive', async () => {
+test('inclusive bounds balance optimal lengths, duplicate seeds are skipped, and IDs are consecutive', async () => {
   const events: GenerationEvent[] = [];
   const scrambles = ['R', 'R', 'F', 'L', 'B', 'D'];
   const solve = jest.fn().mockReturnValueOnce(result(1)).mockReturnValueOnce(result(2))
     .mockReturnValueOnce(null).mockReturnValueOnce(result(4));
-  await generateWorksheet({ ...DEFAULT_SETTINGS, minimum: 2, maximum: 4, count: 2 },
+  await generateWorksheet({ ...DEFAULT_SETTINGS, minimum: 2, maximum: 3, count: 2 },
     { solve }, event => events.push(event),
     { scramble: () => scrambles.shift()!, yieldControl: immediate });
   const rows = events.filter((e): e is Extract<GenerationEvent, { type: 'row' }> => e.type === 'row');
-  expect(rows.map(e => e.row.moves.length)).toEqual([2, 4]);
+  expect(rows.map(e => e.row.moves.length)).toEqual([2, 3]);
   expect(rows.map(e => e.row.id)).toEqual([1, 2]);
-  expect(rows.map(e => e.row.scramble)).toEqual(['F', 'B']);
+  expect(rows.map(e => e.row.scramble)).toEqual(['F', 'B U']);
   expect(solve).toHaveBeenCalledTimes(4);
+  expect(solve.mock.calls.every(([, settings]) => settings.maximum === 20)).toBe(true);
   expect(events[events.length - 1]).toMatchObject({ type: 'done', attempts: 5 });
+});
+
+test.each([
+  [4, 5, 20, [10, 10]],
+  [3, 6, 20, [5, 5, 5, 5]],
+  [4, 5, 21, [11, 10]],
+  [4, 8, 3, [1, 1, 1, 0, 0]],
+  [4, 4, 3, [3]],
+])('balances %i–%i turns across %i rows', async (minimum, maximum, count, expected) => {
+  const events: GenerationEvent[] = [];
+  let sequence = 0;
+  const solve = jest.fn(() => result(9));
+  await generateWorksheet({ ...DEFAULT_SETTINGS, minimum, maximum, count },
+    { solve }, event => events.push(event),
+    { scramble: () => `R ${Array(++sequence).fill('F').join(' ')}`, yieldControl: immediate });
+  const rows = events.flatMap(event => event.type === 'row' ? [event.row] : []);
+  expect(Array.from({ length: maximum - minimum + 1 }, (_, i) =>
+    rows.filter(row => row.moves.length === minimum + i).length)).toEqual(expected);
+  expect(rows.map(row => row.id)).toEqual(Array.from({ length: count }, (_, i) => i + 1));
+  expect(rows.every(row => row.algorithm.split(' ').length === row.moves.length)).toBe(true);
+  expect(solve).toHaveBeenCalledTimes(count);
+  expect(events[events.length - 1]).toMatchObject({ type: 'done', attempts: count });
+});
+
+test('a broad range balances attainable lengths without waiting for impossible upper lengths', async () => {
+  const events: GenerationEvent[] = [];
+  let sequence = 0;
+  await generateWorksheet({ ...DEFAULT_SETTINGS, minimum: 0 }, { solve: () => result(6) }, event => events.push(event),
+    { scramble: () => `R ${Array(++sequence).fill('F').join(' ')}`, yieldControl: immediate });
+  const rows = events.flatMap(event => event.type === 'row' ? [event.row] : []);
+  expect(Array.from({ length: 7 }, (_, i) => rows.filter(row => row.moves.length === i).length))
+    .toEqual([3, 3, 3, 3, 3, 3, 2]);
+  expect(rows.find(row => !row.moves.length)?.algorithm).toBe('');
+  expect(events[events.length - 1]).toMatchObject({ type: 'done', attempts: 20 });
+});
+
+test('biased seeds get bounded retries instead of overfilling easy lengths', async () => {
+  const events: GenerationEvent[] = [];
+  let sequence = 0;
+  await generateWorksheet({ ...DEFAULT_SETTINGS, minimum: 3, maximum: 6 },
+    { solve: () => result(sequence % 4 === 1 ? 6 : 5) }, event => events.push(event),
+    { scramble: () => `R ${Array(++sequence).fill('F').join(' ')}`, yieldControl: immediate });
+  const rows = events.flatMap(event => event.type === 'row' ? [event.row] : []);
+  expect(Array.from({ length: 4 }, (_, i) => rows.filter(row => row.moves.length === i + 3).length))
+    .toEqual([5, 5, 5, 5]);
+  expect(sequence).toBeGreaterThan(20);
+  expect(sequence).toBeLessThan(80);
+});
+
+test('an exceptionally hard seed does not make a worksheet wait forever for more of that length', async () => {
+  const events: GenerationEvent[] = [];
+  let sequence = 0;
+  await generateWorksheet({ ...DEFAULT_SETTINGS, minimum: 3, maximum: 8 },
+    { solve: () => result(sequence === 1 ? 8 : 6) }, event => events.push(event),
+    { maxAttempts: 200, scramble: () => `R ${Array(++sequence).fill('F').join(' ')}`, yieldControl: immediate });
+  const rows = events.flatMap(event => event.type === 'row' ? [event.row] : []);
+  expect(rows).toHaveLength(20);
+  expect(rows.every(row => row.moves.length >= 3 && row.moves.length <= 8)).toBe(true);
+  expect(events[events.length - 1]).toMatchObject({ type: 'done' });
+  expect(sequence).toBeLessThan(200);
+});
+
+test('duplicate adjusted scrambles do not consume a row or a length allocation', async () => {
+  const events: GenerationEvent[] = [];
+  const scrambles = ['R', 'R U', 'F'];
+  const solve = jest.fn().mockReturnValueOnce(result(5)).mockReturnValue(result(4));
+  await generateWorksheet({ ...DEFAULT_SETTINGS, minimum: 4, maximum: 4, count: 2 },
+    { solve }, event => events.push(event),
+    { scramble: () => scrambles.shift()!, yieldControl: immediate });
+  const rows = events.flatMap(event => event.type === 'row' ? [event.row] : []);
+  expect(rows.map(row => row.scramble)).toEqual(['R U', 'F']);
+  expect(rows.map(row => row.id)).toEqual([1, 2]);
+  expect(events[events.length - 1]).toMatchObject({ type: 'done', attempts: 3 });
 });
 
 test('unproductive filters stop with a clear error instead of spinning forever', async () => {

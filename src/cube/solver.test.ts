@@ -86,7 +86,7 @@ test('two specifically required pairs and color-neutral pair searches are suppor
 });
 
 test('upper bounds exclude unsolved targets, while lower bounds never pad an optimal solve', () => {
-  expect(solver.solve('R', options({ cross: 'White', pair: '8', maximum: 0 }))).toBeNull();
+  expect(solver.solve('R', options({ cross: 'White', pair: '8', minimum: 0, maximum: 0 }))).toBeNull();
   expect(solver.solve('R', options({ cross: 'White', pair: '8', minimum: 5 }))?.moves).toHaveLength(1);
   expect(() => solver.solve('R', options(), -1)).toThrow('time limit');
 });

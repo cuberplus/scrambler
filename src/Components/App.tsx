@@ -177,7 +177,7 @@ function App() {
                   <span className="range-dash">—</span>
                   <div><input id="maximum" aria-label="Maximum turns" type="number" min={settings.minimum} max="20" required value={settings.maximum} onChange={e => update('maximum', e.target.valueAsNumber)} /><span>max</span></div>
                 </div>
-                <p className="field-hint">Keep only scrambles whose shortest solution is in this inclusive range. A half turn counts as one move.</p>
+                <p className="field-hint">Aim for an even mix of shortest-solution lengths in this inclusive range. A half turn counts as one move.</p>
                 <label htmlFor="count">Number of scrambles</label>
                 <input id="count" type="number" min="1" required value={settings.count} onChange={e => update('count', e.target.valueAsNumber)} />
                 <button className="primary-button" type="submit">Generate worksheet <span aria-hidden="true">↗</span></button>
@@ -230,7 +230,7 @@ function App() {
           </section>
         </div>
         <footer className="page-footer"><span>SCRAMBLER<span className="brand-dot">.</span><span className="footer-divider">/</span>Less guessing. More solving.</span>
-          <p>25-turn random-move scrambles, not WCA random-state scrambles.<br />Orientation: U white · F green · R red. Solutions use the scramble’s original orientation.</p></footer>
+          <p>Difficulty-balanced practice scrambles, not WCA random-state scrambles.<br />Orientation: U white · F green · R red. Solutions use the scramble’s original orientation.</p></footer>
       </main>
     </div>
   );
