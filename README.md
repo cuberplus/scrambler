@@ -42,8 +42,9 @@ A deployed site needs no application server.
 
 Use **Print sheet** for a grid-only, portrait worksheet: no site header, footer,
 settings, status, or promotional text. Column headings repeat as part of the
-grid. The compact layout fits 25 scrambles per full page on Letter and A4 paper;
-only the final page may contain fewer rows. Additional custom columns reduce
+grid. The layout fits 20 scrambles per full page on Letter and A4 paper, with
+larger cube diagrams and more space between rows.
+Only the final page may contain fewer rows. Additional custom columns reduce
 the print font size to preserve the page density without dropping columns.
 
 ## Targets and notation

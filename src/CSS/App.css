@@ -125,21 +125,22 @@ progress::-moz-progress-bar { background: #88ab68; }
   .workspace { display: block; margin-top: 0; }
   .worksheet-panel { border: 0; border-radius: 0; overflow: visible; }
   .table-scroll { overflow: visible; padding: 6mm 0; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-  .worksheet { table-layout: fixed; width: 100%; font-size: calc(36pt / var(--print-columns, 6)); color: black; }
+  .worksheet { table-layout: fixed; width: 100%; font-size: calc(39pt / var(--print-columns, 6)); color: black; }
   .worksheet thead { display: table-header-group; }
   .worksheet tr { break-inside: avoid; page-break-inside: avoid; }
-  .worksheet tbody tr { height: 9.5mm; }
-  .worksheet tbody tr:nth-child(25n):not(:last-child) { break-after: page; page-break-after: always; }
+  .worksheet tbody tr { height: 12mm; }
+  .worksheet tbody tr:nth-child(20n):not(:last-child) { break-after: page; page-break-after: always; }
   .worksheet th, .worksheet td { padding: .3mm .5mm; border: 1px solid #aaa; min-width: 0; max-width: none; line-height: 1.1; }
   .worksheet th { font-size: inherit; color: black; overflow-wrap: anywhere; }
   .worksheet td { font-size: inherit; }
   .worksheet .row-number { width: 5mm; padding: .3mm; font-size: inherit; color: #333; }
-  .column-visualization { width: 16mm; }
+  .column-visualization { width: 22mm; }
+  .column-solution { width: 25%; }
   .column-turns { width: 12mm; }
   .column-cross { width: 15mm; }
   .column-pairs { width: 20mm; }
   .column-custom { min-width: 0; }
-  .cube-net { width: 11mm; height: 8.4mm; }
+  .cube-net { width: 14mm; height: 10.7mm; }
   .algorithm { font-size: inherit; line-height: 1.1; word-spacing: 0; overflow-wrap: anywhere; }
   .turn-count { font-size: inherit; min-width: 0; border: 0; background: transparent; padding: 0; }
   .turn-count small { font-size: .65em; color: #333; margin-top: 1px; letter-spacing: 0; }
