@@ -91,6 +91,9 @@ test.each([
   expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
   expect(new Set(rows.map(row => row.scramble)).size).toBe(20);
   for (const row of rows) {
+    const faces = parseAlgorithm(row.scramble).map(move => Math.floor(move / 3));
+    expect(faces.every((face, i) => i === 0 || face !== faces[i - 1])).toBe(true);
+    expect(faces.every((face, i) => i < 2 || face !== faces[i - 2] || face % 3 !== faces[i - 1] % 3)).toBe(true);
     verifySolution(applyMoves(solvedCube(), parseAlgorithm(row.scramble)), row, settings);
     expect(solver.solve(row.scramble, settings)?.moves.length).toBe(row.moves.length);
   }

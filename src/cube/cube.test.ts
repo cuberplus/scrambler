@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import {
   COLORS, CORNER_MOVES, CORNERS, EDGE_MOVES, EDGES, MOVES, ROTATIONS,
-  applyMoves, inverseMoves, parseAlgorithm, randomScramble, rotateCube, solvedCube, stickers,
+  applyMoves, inverseMoves, parseAlgorithm, randomScramble, rotateCube, simplifyMoves, solvedCube, stickers,
 } from './cube';
 import { referenceFacelets, seededRandom } from './testHelpers';
 
@@ -72,4 +72,47 @@ test('scrambles have 25 legal HTM moves and avoid reducible neighboring turns', 
   expect(parseAlgorithm(' \n ')).toEqual([]);
   expect(() => parseAlgorithm('R banana')).toThrow('Invalid move');
   expect(() => applyMoves(solvedCube(), [18])).toThrow('Invalid move');
+});
+
+test.each([
+  ['U U', 'U2'],
+  ["F' F2", 'F'],
+  ['L R L', 'L2 R'],
+  ["U D U'", 'D'],
+  ['B F2 B', 'B2 F2'],
+  ["R U D U' D' R'", ''],
+  ['U2 U2', ''],
+  ['R U R', 'R U R'],
+  ['', ''],
+])('simplifies %s to %s without changing the cube', (algorithm, expected) => {
+  const moves = parseAlgorithm(algorithm), simplified = simplifyMoves(moves);
+  expect(simplified.map(move => MOVES[move]).join(' ')).toBe(expected);
+  expect(applyMoves(solvedCube(), simplified)).toEqual(applyMoves(solvedCube(), moves));
+  expect(moves).toEqual(parseAlgorithm(algorithm));
+});
+
+test.each([
+  ["R F U U' F' R'", ''],
+  ["R L F B U D U' D' F' B' R' L'", ''],
+  ["F R U U' R' F", 'F2'],
+])('cascading cancellations in %s leave no further reductions', (algorithm, expected) => {
+  const moves = parseAlgorithm(algorithm), simplified = simplifyMoves(moves);
+  expect(simplified.map(move => MOVES[move]).join(' ')).toBe(expected);
+  expect(applyMoves(solvedCube(), simplified)).toEqual(applyMoves(solvedCube(), moves));
+  expect(simplifyMoves(simplified)).toEqual(simplified);
+});
+
+test('all three-move combinations simplify without changing state or leaving reducible turns', () => {
+  for (let a = 0; a < 18; a++) {
+    for (let b = 0; b < 18; b++) {
+      for (let c = 0; c < 18; c++) {
+        const moves = [a, b, c], simplified = simplifyMoves(moves);
+        expect(applyMoves(solvedCube(), simplified)).toEqual(applyMoves(solvedCube(), moves));
+        const faces = simplified.map(move => Math.floor(move / 3));
+        expect(faces.every((face, i) => i === 0 || face !== faces[i - 1])).toBe(true);
+        expect(faces.length < 3 || faces[0] !== faces[2] || faces[0] % 3 !== faces[1] % 3).toBe(true);
+        expect(simplifyMoves(simplified)).toEqual(simplified);
+      }
+    }
+  }
 });

@@ -79,6 +79,26 @@ export function inverseMoves(moves: readonly number[]): number[] {
   return moves.slice().reverse().map(m => Math.floor(m / 3) * 3 + 2 - m % 3);
 }
 
+export function simplifyMoves(moves: readonly number[]): number[] {
+  const result: number[] = [];
+  for (const move of moves) {
+    const face = Math.floor(move / 3);
+    let index = result.length - 1;
+    while (index >= 0 && Math.floor(result[index] / 3) % 3 === face % 3) {
+      if (Math.floor(result[index] / 3) === face) break;
+      index--;
+    }
+    if (index >= 0 && Math.floor(result[index] / 3) === face) {
+      const turns = (result[index] % 3 + move % 3 + 2) % 4;
+      if (turns) result[index] = face * 3 + turns - 1;
+      else result.splice(index, 1);
+    } else {
+      result.push(move);
+    }
+  }
+  return result;
+}
+
 export const ROTATIONS: Rotation[] = [];
 for (let up = 0; up < 6; up++) {
   for (let front = 0; front < 6; front++) {

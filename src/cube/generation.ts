@@ -1,4 +1,4 @@
-import { MOVES, randomScramble } from './cube';
+import { MOVES, parseAlgorithm, randomScramble, simplifyMoves } from './cube';
 import { Settings, Solution, Solver, validateSettings } from './solver';
 
 export interface WorksheetRow extends Solution { id: number; scramble: string }
@@ -42,7 +42,8 @@ export async function generateWorksheet(settings: Settings, solver: Pick<Solver,
         }
         const prefix = solution.moves.length - length;
         // Every suffix of a globally shortest solution is itself globally shortest.
-        const scramble = [seed, ...solution.moves.slice(0, prefix).map(move => MOVES[move])].join(' ');
+        const scramble = simplifyMoves([...parseAlgorithm(seed), ...solution.moves.slice(0, prefix)])
+          .map(move => MOVES[move]).join(' ');
         // Retry easy seeds briefly when a harder length is behind, without stalling on rare lengths.
         if (!emitted.has(scramble) &&
             (counts[length - settings.minimum] === least || ++balancingMisses >= 8)) {
